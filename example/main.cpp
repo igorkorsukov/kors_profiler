@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     //! NOTE Custom setup
 
     // custom printer
-    using namespace kors::profiler;
+    using namespace app::profiler;
     struct MyPrinter : public Profiler::Printer
     {
         void printDebug(const std::string& str) override { std::clog << str << std::endl; }
