@@ -197,12 +197,20 @@ void Profiler::clear()
 
 Profiler::Data Profiler::threadsData(Data::Mode mode) const
 {
+    std::vector<std::thread::id> funcsThreads;
+    std::vector<FuncTimers> funcsTimers;
+    {
+        std::lock_guard<std::mutex> lock(m_funcs.mutex);
+        funcsThreads = m_funcs.threads;
+        funcsTimers = m_funcs.timers;
+    }
+
     Data data;
-    data.mainThread = m_funcs.threads[MAIN_THREAD_INDEX];
+    data.mainThread = funcsThreads[MAIN_THREAD_INDEX];
 
     std::thread::id empty;
-    for (size_t i = 0; i < m_funcs.threads.size(); ++i) {
-        std::thread::id th = m_funcs.threads[i];
+    for (size_t i = 0; i < funcsThreads.size(); ++i) {
+        std::thread::id th = funcsThreads.at(i);
         if (th == empty) {
             break;
         }
@@ -220,7 +228,7 @@ Profiler::Data Profiler::threadsData(Data::Mode mode) const
         Data::Thread thdata;
         thdata.thread = th;
 
-        const FuncTimers& timers = m_funcs.timers[i];
+        const FuncTimers& timers = funcsTimers.at(i);
         for (auto it : timers) {
             const FuncTimer* ft = it.second;
             Data::Func f(

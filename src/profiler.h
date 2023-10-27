@@ -222,7 +222,7 @@ private:
     Printer* m_printer = nullptr;
 
     StepsData m_steps;
-    FuncsData m_funcs;
+    mutable FuncsData m_funcs;
 
     size_t m_stackCounter = 0;
 };
