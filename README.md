@@ -1,7 +1,7 @@
-Simple profiler
----------------
+# profiler
+
 Simple, embedded profiler with very small overhead  
-(ported from https://github.com/igorkorsukov/qzebradev)
+Requires C++17 and higher.
   
 Features:
 * Embedded profiler (can run anywhere and anytime)
@@ -12,11 +12,24 @@ Features:
 * Thread safe (without use mutex)
 * Custom data printer
 
-[Example](tests/main.cpp)
+[Example](example/main.cpp)
 
+Used in at least two private commercial projects and one [open source](https://github.com/musescore/MuseScore).
+
+## Integration 
 To use Profiler within your software project include the Profiler source into your project
 
 Source:
 * profiler.h/cpp - profiler and macros
+* funcinfo.h - macros for parsing signatures
 
-or see and include `src/profiler.cmake` in the cmake project
+or see and include `profiler.cmake` in the cmake project
+
+## ChangeLog
+
+### v1.1
+* Improved parsing of function signatures
+* Fixed get threads data
+
+### v1.0
+* Ported from [https://github.com/igorkorsukov/qzebradev](https://github.com/igorkorsukov/qzebradev)

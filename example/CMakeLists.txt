@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(${CMAKE_CURRENT_LIST_DIR}/../profiler.cmake)
 
 include_directories(${KORS_PROFILER_INC})
+add_definitions(-DKORS_PROFILER_ENABLED)
 
 add_executable(${PROJECT_NAME}
     main.cpp

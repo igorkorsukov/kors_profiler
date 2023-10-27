@@ -37,7 +37,7 @@ SOFTWARE.
 
 #include "funcinfo.h"
 
-#define KORS_PROFILER_ENABLED
+// #define KORS_PROFILER_ENABLED
 
 #ifdef KORS_PROFILER_ENABLED
 
