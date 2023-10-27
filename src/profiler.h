@@ -34,21 +34,15 @@ SOFTWARE.
 #include <chrono>
 #include <sstream>
 
-#define KORS_PROFILER_ENABLED
+#include "funcinfo.h"
 
-#ifndef FUNC_INFO
-#if defined(_MSC_VER)
-    #define FUNC_INFO __FUNCSIG__
-#else
-    #define FUNC_INFO __PRETTY_FUNCTION__
-#endif
-#endif
+#define KORS_PROFILER_ENABLED
 
 #ifdef KORS_PROFILER_ENABLED
 
 #ifndef TRACEFUNC
 #define TRACEFUNC \
-    static std::string __func_info(kors::profiler::FuncMarker::formatSig(FUNC_INFO)); \
+    static std::string __func_info(CLASSFUNC); \
     kors::profiler::FuncMarker __funcMarker(__func_info);
 #endif
 
@@ -252,8 +246,6 @@ struct FuncMarker
             Profiler::instance()->endFunc(timer, func);
         }
     }
-
-    static std::string formatSig(const std::string& sig);
 
     Profiler::FuncTimer* timer = nullptr;
     const std::string& func;

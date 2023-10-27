@@ -275,44 +275,6 @@ bool Profiler::save_file(const std::string& path, const std::string& content)
     return count > 0;
 }
 
-std::string FuncMarker::formatSig(const std::string& sig)
-{
-    static const std::string Colon("::");
-    static const std::string Space(" ");
-    static const std::string ArgBegin("(");
-
-    std::size_t endFunc = sig.find_first_of(ArgBegin);
-    if (endFunc == std::string::npos) {
-        return sig;
-    }
-
-    std::size_t beginFunc = sig.find_last_of(Colon, endFunc);
-    if (beginFunc == std::string::npos) {
-        return sig;
-    }
-
-    std::size_t beginClassColon = sig.find_last_of(Colon, beginFunc - 2);
-    std::size_t beginClassSpace = sig.find_last_of(Space, beginFunc - 2);
-
-    std::size_t beginClass = std::string::npos;
-    if (beginClassColon == std::string::npos) {
-        beginClass = beginClassSpace;
-    } else if (beginClassSpace == std::string::npos) {
-        beginClass = beginClassColon;
-    } else {
-        beginClass = std::max(beginClassColon, beginClassSpace);
-    }
-
-    if (beginClass == std::string::npos) {
-        beginClass = beginFunc;
-    } else {
-        beginClass += 1;
-    }
-
-    std::string str = sig.substr(beginClass, (endFunc - beginClass));
-    return str;
-}
-
 double Profiler::StepTimer::beginMs() const
 {
     return beginTime.mlsecsElapsed();
