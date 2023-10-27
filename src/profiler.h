@@ -97,7 +97,7 @@ public:
         bool funcsTimeEnabled = true;
         bool funcsTraceEnabled = false;
         size_t funcsMaxThreadCount = 100;
-        int dataTopCount = 150;
+        int statTopCount = 150;
     };
 
     struct Data {

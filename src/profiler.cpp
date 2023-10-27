@@ -255,13 +255,13 @@ Profiler::Data Profiler::threadsData(Data::Mode mode) const
 std::string Profiler::threadsDataString(Data::Mode mode) const
 {
     Profiler::Data data = threadsData(mode);
-    return printer()->formatData(data, mode, m_options.dataTopCount);
+    return printer()->formatData(data, mode, m_options.statTopCount);
 }
 
 void Profiler::printThreadsData(Data::Mode mode) const
 {
     Profiler::Data data = threadsData(mode);
-    printer()->printData(data, mode, m_options.dataTopCount);
+    printer()->printData(data, mode, m_options.statTopCount);
 }
 
 void Profiler::print(const std::string& str)
