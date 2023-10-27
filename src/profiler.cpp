@@ -46,6 +46,12 @@ Profiler::~Profiler()
     delete m_printer;
 }
 
+Profiler* Profiler::instance()
+{
+    static Profiler p;
+    return &p;
+}
+
 void Profiler::setup(const Options& opt, Printer* printer)
 {
     m_options = opt;
@@ -182,7 +188,7 @@ void Profiler::clear()
     }
     {
         std::lock_guard<std::mutex> lock(m_funcs.mutex);
-        for (auto st : m_steps.timers) {
+        for (auto& st : m_steps.timers) {
             delete st.second;
         }
         m_steps.timers.clear();
@@ -344,7 +350,7 @@ using mclock = std::chrono::high_resolution_clock;
 
 void Profiler::ElapsedTimer::start()
 {
-    _start = mclock::now();
+    m_start = mclock::now();
 }
 
 void Profiler::ElapsedTimer::restart()
@@ -355,19 +361,19 @@ void Profiler::ElapsedTimer::restart()
 double Profiler::ElapsedTimer::mlsecsElapsed() const
 {
     auto end = mclock::now();
-    std::chrono::duration<double, std::milli> elapsed = end - _start;
+    std::chrono::duration<double, std::milli> elapsed = end - m_start;
 
     return elapsed.count();
 }
 
 void Profiler::ElapsedTimer::invalidate()
 {
-    _start = mclock::time_point();
+    m_start = mclock::time_point();
 }
 
 bool Profiler::ElapsedTimer::isValid() const
 {
-    const mclock::duration since_epoch = _start.time_since_epoch();
+    const mclock::duration since_epoch = m_start.time_since_epoch();
     return since_epoch.count() > 0;
 }
 
@@ -376,12 +382,12 @@ Profiler::Printer::~Printer()
 
 void Profiler::Printer::printDebug(const std::string& str)
 {
-    std::cout << str << '\n';
+    std::cout << str << std::endl;
 }
 
 void Profiler::Printer::printInfo(const std::string& str)
 {
-    std::cout << str << '\n';
+    std::cout << str << std::endl;
 }
 
 static std::string formatDouble(double val, size_t prec)

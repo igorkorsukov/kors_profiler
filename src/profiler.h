@@ -25,6 +25,7 @@ SOFTWARE.
 #define KORS_PROFILER_H
 
 #include <string>
+#include <string_view>
 #include <list>
 #include <vector>
 #include <set>
@@ -88,19 +89,15 @@ class Profiler
 {
 public:
 
-    static Profiler* instance()
-    {
-        static Profiler p;
-        return &p;
-    }
+    static Profiler* instance();
 
     struct Options {
-        bool stepTimeEnabled{ true };
-        bool funcsTimeEnabled{ true };
-        bool funcsTraceEnabled{ false };
-        size_t funcsMaxThreadCount{ 100 };
-        int dataTopCount{ 150 };
         Options() {}
+        bool stepTimeEnabled = true;
+        bool funcsTimeEnabled = true;
+        bool funcsTraceEnabled = false;
+        size_t funcsMaxThreadCount = 100;
+        int dataTopCount = 150;
     };
 
     struct Data {
@@ -112,8 +109,8 @@ public:
 
         struct Func {
             std::string func;
-            long callcount{ 0 };
-            double sumtimeMs{ 0. };
+            long callcount = 0;
+            double sumtimeMs = 0.0;
             Func() {}
             Func(const std::string& f, long cc, double st)
                 : func(f), callcount(cc), sumtimeMs(st) {}
@@ -149,14 +146,14 @@ public:
         bool isValid() const;
 
     private:
-        std::chrono::high_resolution_clock::time_point _start;
+        std::chrono::high_resolution_clock::time_point m_start;
     };
 
     struct FuncTimer {
         const std::string& func;
         ElapsedTimer timer;
-        long callcount;
-        double sumtimeMs;
+        long callcount = 0;
+        double sumtimeMs = 0.0;
         explicit FuncTimer(const std::string& f)
             : func(f), callcount(0), sumtimeMs(0) {}
     };
