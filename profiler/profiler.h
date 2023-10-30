@@ -126,7 +126,7 @@ public:
     };
 
     struct Printer {
-        virtual ~Printer();
+        virtual ~Printer() = default;
         virtual void printDebug(const std::string& str);
         virtual void printInfo(const std::string& str);
         virtual void printStep(const std::string& tag, double beginMs, double stepMs, const std::string& info);
@@ -136,6 +136,9 @@ public:
         virtual std::string formatData(const Data& data, Data::Mode mode, int maxcount) const;
         virtual void funcsToStream(std::stringstream& stream, const std::string& title, const std::list<Data::Func>& funcs,
                                    int count) const;
+
+        static std::string formatDouble(double val, size_t prec);
+        static std::string leftJustified(const std::string& in, size_t width);
     };
 
     struct ElapsedTimer {

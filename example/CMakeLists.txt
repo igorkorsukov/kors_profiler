@@ -7,7 +7,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(${CMAKE_CURRENT_LIST_DIR}/../profiler.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../profiler/profiler.cmake)
 
 add_definitions(-DKORS_PROFILER_ENABLED)
 

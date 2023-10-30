@@ -385,9 +385,6 @@ bool Profiler::ElapsedTimer::isValid() const
     return since_epoch.count() > 0;
 }
 
-Profiler::Printer::~Printer()
-{}
-
 void Profiler::Printer::printDebug(const std::string& str)
 {
     std::cout << str << std::endl;
@@ -398,7 +395,7 @@ void Profiler::Printer::printInfo(const std::string& str)
     std::cout << str << std::endl;
 }
 
-static std::string formatDouble(double val, size_t prec)
+std::string Profiler::Printer::formatDouble(double val, size_t prec)
 {
     std::stringstream ss;
     ss << std::fixed << std::setprecision(prec) << val;
@@ -530,15 +527,13 @@ std::string Profiler::Printer::formatData(const Data& data, Data::Mode mode, int
     return stream.str();
 }
 
-static std::string leftJustified(const std::string& val, size_t width)
+std::string Profiler::Printer::leftJustified(const std::string& in, size_t width)
 {
-    std::string str;
-    str.resize(width, ' ');
-    size_t lenght = width < val.size() ? width : val.size();
-    for (size_t i = 0; i < lenght; ++i) {
-        str[i] = val[i];
+    std::string out = in;
+    if (width > out.size()) {
+        out.resize(width, ' ');
     }
-    return str;
+    return out;
 }
 
 #define FORMAT(str, width) leftJustified(str, width)

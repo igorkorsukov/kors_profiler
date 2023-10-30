@@ -1,7 +1,7 @@
 #ifndef EXAMPLE_PROFILER_H
 #define EXAMPLE_PROFILER_H
 
-#include "../src/profiler.h" // kors
+#include "../profiler/profiler.h" // kors
 
 namespace app::profiler {
 using Profiler = kors::profiler::Profiler;
