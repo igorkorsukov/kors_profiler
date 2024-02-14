@@ -107,12 +107,9 @@ void Profiler::stepTime(const std::string& tag, const std::string& info, bool is
 Profiler::FuncTimer* Profiler::beginFunc(const std::string& func)
 {
     std::thread::id th = std::this_thread::get_id();
-    int idx = m_funcs.threadIndex(th);
+    int idx = m_funcs.addThread(th);
     if (idx == -1) {
-        idx = m_funcs.addThread(th);
-        if (idx == -1) {
-            return nullptr;
-        }
+        return nullptr;
     }
     size_t index = static_cast<size_t>(idx);
 
