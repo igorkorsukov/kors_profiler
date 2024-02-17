@@ -52,9 +52,14 @@ Profiler* Profiler::instance()
     return &p;
 }
 
+void Profiler::setupDefault()
+{
+    setup(Options(), nullptr);
+}
+
 void Profiler::setup(const Options& opt, Printer* printer)
 {
-    m_options = opt;
+    m_options.assign(opt);
     m_options.funcsMaxThreadCount = m_options.funcsMaxThreadCount < 1 ? 1 : m_options.funcsMaxThreadCount;
 
     //! Func timers
@@ -64,6 +69,8 @@ void Profiler::setup(const Options& opt, Printer* printer)
     m_funcs.threads.resize(m_options.funcsMaxThreadCount);
     std::fill(m_funcs.threads.begin(), m_funcs.threads.end(), std::thread::id());
     m_funcs.threads[MAIN_THREAD_INDEX] = std::this_thread::get_id();
+
+    m_funcs.lastIndex.store(1);
 
     if (printer) {
         delete m_printer;
@@ -109,14 +116,11 @@ Profiler::FuncTimer* Profiler::beginFunc(const std::string& func)
     std::thread::id th = std::this_thread::get_id();
     int idx = m_funcs.threadIndex(th);
     if (idx == -1) {
-        idx = m_funcs.addThread(th);
-        if (idx == -1) {
-            return nullptr;
-        }
+        return nullptr;
     }
     size_t index = static_cast<size_t>(idx);
 
-    FuncTimer* timer{ nullptr };
+    FuncTimer* timer = nullptr;
     FuncTimers& fts = m_funcs.timers[index];
     FuncTimers::const_iterator it = fts.find(&func);
     if (it == fts.end()) {
@@ -316,42 +320,31 @@ void Profiler::StepTimer::nextStep()
     stepTime.restart();
 }
 
-int Profiler::FuncsData::threadIndex(std::thread::id th) const
+int Profiler::FuncsData::threadIndex(std::thread::id th)
 {
-    std::thread::id empty;
-    size_t count = this->threads.size();
-    for (size_t i = 0; i < count; ++i) {
-        std::thread::id thi = this->threads[i];
-        if (thi == th) {
-            return static_cast<int>(i);
-        }
-
-        if (thi == empty) {
-            return -1;
-        }
-    }
-    return -1;
-}
-
-int Profiler::FuncsData::addThread(std::thread::id th)
-{
-    std::lock_guard<std::mutex> lock(this->mutex);
-
-    int index = threadIndex(th);
-    if (index > -1) {
-        return index;
+    size_t _last = lastIndex.load();
+    if (_last >= threads.size()) {
+        return -1;
     }
 
-    size_t count = this->threads.size();
-    std::thread::id empty;
-    for (size_t i = 0; i < count; ++i) {
-        std::thread::id thi = this->threads[i];
-        if (thi == empty) {
-            this->threads[i] = th;
+    // try find
+    for (size_t i = 0; i <= _last; ++i) {
+        if (threads[i] == th) {
             return static_cast<int>(i);
         }
     }
-    return -1;
+
+    // not found
+    std::lock_guard<std::mutex> lock(mutex);
+    _last = lastIndex.load();
+    if (_last >= threads.size()) {
+        return -1;
+    }
+    size_t idx = lastIndex;
+    threads[idx] = th;
+    lastIndex.store(++_last);
+
+    return static_cast<int>(idx);
 }
 
 using mclock = std::chrono::high_resolution_clock;
@@ -412,13 +405,13 @@ void Profiler::Printer::printStep(const std::string& tag, double beginMs, double
     str.reserve(100);
 
     str
-    .append(tag)
-    .append(COLON)
-    .append(formatDouble(beginMs, 3))
-    .append(SEP)
-    .append(formatDouble(stepMs, 3))
-    .append(MS)
-    .append(info);
+        .append(tag)
+        .append(COLON)
+        .append(formatDouble(beginMs, 3))
+        .append(SEP)
+        .append(formatDouble(stepMs, 3))
+        .append(MS)
+        .append(info);
 
     printDebug(str);
 }
@@ -446,12 +439,12 @@ void Profiler::Printer::printTraceEnd(const std::string& func, double calltimeMs
     std::string str;
     str.reserve(100);
     str
-    .append(indent)
-    .append(END)
-    .append(func)
-    .append(CALLTIME).append(formatDouble(calltimeMs, 3))
-    .append(CALLCOUNT).append(std::to_string(callcount))
-    .append(SUMTIME).append(formatDouble(sumtimeMs, 3));
+        .append(indent)
+        .append(END)
+        .append(func)
+        .append(CALLTIME).append(formatDouble(calltimeMs, 3))
+        .append(CALLCOUNT).append(std::to_string(callcount))
+        .append(SUMTIME).append(formatDouble(sumtimeMs, 3));
 
     printDebug(str);
     //}
