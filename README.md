@@ -34,6 +34,9 @@ See example:
 
 ## ChangeLog
 
+### v1.2
+* Fixed thread data race 
+
 ### v1.1
 * Improved parsing of function signatures
 * Fixed get threads data

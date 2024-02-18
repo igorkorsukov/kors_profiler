@@ -11,6 +11,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/../profiler/profiler.cmake)
 
 add_definitions(-DKORS_PROFILER_ENABLED)
 
+add_compile_options("-fsanitize=thread")
+link_libraries("-fsanitize=thread")
+
 add_executable(${PROJECT_NAME}
     main.cpp
     ${KORS_PROFILER_SRC}
